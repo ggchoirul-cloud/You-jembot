@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#FFD400" />
+<meta name="description" content="Study Planner Premium — atur jadwal belajar, target nilai, dan progres menuju juara 1." />
+<title>Study Planner Premium</title>
+
+<link rel="icon" href="favicon.ico" sizes="any" />
+<link rel="apple-touch-icon" href="assets/icon-180.png" />
+<link rel="manifest" href="manifest.json" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ================= LOADING SCREEN ================= -->
+<div id="loading-screen" class="loading-screen" aria-hidden="true">
+  <div class="loader-mark">
+    <div class="loader-ring"></div>
+    <i class="fa-solid fa-graduation-cap"></i>
+  </div>
+  <p class="loader-title">Study Planner</p>
+  <p class="loader-sub">Menyiapkan ruang belajarmu…</p>
+</div>
+
+<!-- ================= TOAST CONTAINER ================= -->
+<div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+<!-- ================= CONFETTI CANVAS ================= -->
+<canvas id="confetti-canvas" class="confetti-canvas"></canvas>
+
+<div class="app-shell">
+
+  <!-- ================= SIDEBAR (desktop) / BOTTOM NAV (mobile) ================= -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img src="assets/icon.png" alt="" class="brand-icon" />
+      <div>
+        <p class="brand-name">Study Planner</p>
+        <p class="brand-tag">Premium</p>
+      </div>
+    </div>
+
+    <nav class="nav-menu" id="nav-menu">
+      <button class="nav-item active" data-target="dashboard"><i class="fa-solid fa-house"></i><span>Dashboard</span></button>
+      <button class="nav-item" data-target="jadwal"><i class="fa-solid fa-table-list"></i><span>Jadwal Belajar</span></button>
+      <button class="nav-item" data-target="checklist"><i class="fa-solid fa-list-check"></i><span>Checklist Harian</span></button>
+      <button class="nav-item" data-target="target"><i class="fa-solid fa-bullseye"></i><span>Target Nilai</span></button>
+      <button class="nav-item" data-target="tracker"><i class="fa-solid fa-pen-to-square"></i><span>Tracker Nilai</span></button>
+      <button class="nav-item" data-target="grafik"><i class="fa-solid fa-chart-line"></i><span>Grafik</span></button>
+      <button class="nav-item" data-target="progress"><i class="fa-solid fa-crown"></i><span>Progress Juara 1</span></button>
+      <button class="nav-item" data-target="statistik"><i class="fa-solid fa-chart-pie"></i><span>Statistik</span></button>
+      <button class="nav-item" data-target="pomodoro"><i class="fa-solid fa-stopwatch"></i><span>Pomodoro</span></button>
+      <button class="nav-item" data-target="kalender"><i class="fa-regular fa-calendar"></i><span>Kalender</span></button>
+      <button class="nav-item" data-target="achievement"><i class="fa-solid fa-award"></i><span>Achievement</span></button>
+      <button class="nav-item" data-target="export"><i class="fa-solid fa-file-export"></i><span>Export &amp; Backup</span></button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="theme-toggle" id="theme-toggle" title="Ganti kecerahan aksen">
+        <i class="fa-solid fa-circle-half-stroke"></i>
+      </button>
+      <p class="sidebar-note">Dibuat untuk Gilang ✦</p>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="main-content" id="main-content">
+
+    <!-- top bar (mobile) -->
+    <header class="topbar">
+      <button class="icon-btn" id="menu-btn" aria-label="Buka menu"><i class="fa-solid fa-bars"></i></button>
+      <p class="topbar-title" id="topbar-title">Dashboard</p>
+      <button class="icon-btn" id="notif-btn" aria-label="Notifikasi"><i class="fa-regular fa-bell"></i></button>
+    </header>
+
+    <!-- ============ SECTION: DASHBOARD ============ -->
+    <section class="view active" id="view-dashboard">
+      <div class="greet-card">
+        <div>
+          <p class="greet-hello" id="greet-hello">Halo, Gilang 👋</p>
+          <p class="greet-sub">Selamat datang di Study Planner. Semangat menuju Juara 1 hari ini!</p>
+        </div>
+        <div class="greet-orb"><i class="fa-solid fa-graduation-cap"></i></div>
+      </div>
+
+      <div class="stat-grid" id="dashboard-stats">
+        <div class="stat-card skeleton" data-stat="jam"></div>
+        <div class="stat-card skeleton" data-stat="streak"></div>
+        <div class="stat-card skeleton" data-stat="target"></div>
+        <div class="stat-card skeleton" data-stat="ranking"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h3><i class="fa-solid fa-crown"></i> Progress Menuju Juara 1</h3>
+          <span class="pill" id="dash-level-pill">Pemula</span>
+        </div>
+        <div class="progress-track big">
+          <div class="progress-fill" id="dash-progress-fill" style="width:0%"></div>
+        </div>
+        <p class="progress-caption" id="dash-progress-caption">Rata-rata nilai: 0</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head"><h3><i class="fa-solid fa-list-check"></i> Checklist Hari Ini</h3></div>
+          <div id="dash-checklist-mini" class="mini-list"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3><i class="fa-solid fa-table-list"></i> Jadwal Hari Ini</h3></div>
+          <div id="dash-jadwal-mini" class="mini-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION: JADWAL BELAJAR ============ -->
+    <section class="view" id="view-jadwal">
+      <div class="view-head">
+        <h2><i class="fa-solid fa-table-list"></i> Jadwal Belajar</h2>
+        <button class="btn-primary ripple" id="btn-add-jadwal"><i class="fa-solid fa-plus"></i> Tambah Jadwal</button>
+      </div>
+      <div class="day-tabs" id="day-tabs"></div>
+      <div class="schedule-table-wrap">
+        <table class="schedule-table">
+          <thead>
+            <tr><th>Jam</th><th>Mata Pelajaran</th><th>Selesai</th><th></th></tr>
+          </thead>
+          <tbody id="schedule-tbody"></tbody>
+        </table>
+        <p class="empty-hint" id="schedule-empty" hidden>Belum ada jadwal untuk hari ini. Tambahkan jadwal baru ✦</p>
+      </div>
+    </section>
+
+    <!-- ============ SECTION: CHECKLIST HARIAN ============ -->
+    <section class="view" id="view-checklist">
+      <div class="view-head">
+        <h2><i class="fa-solid fa-list-check"></i> Checklist Harian</h2>
+        <span class="pill" id="checklist-date"></span>
+      </div>
+      <div class="panel">
+        <div class="progress-track">
+          <div class="progress-fill" id="checklist-progress-fill" style="width:0%"></div>
+        </div>
+        <p class="progress-caption" id="checklist-progress-caption">0 / 0 selesai</p>
+      </div>
+      <div class="checklist-big" id="checklist-big"></div>
+    </section>
+
+    <!-- ============ SECTION: TARGET NILAI ============ -->
+    <section class="view" id="view-target">
+      <div class="view-head">
+        <h2><i class="fa-solid fa-bullseye"></i> Target Nilai</h2>
+      </div>
+      <div class="target-grid" id="target-grid"></div>
+    </section>
+
+    <!-- ============ SECTION: TRACKER NILAI ============ -->
+    <section class="view" id="view-tracker">
+      <div class="view-head">
+        <h2><i class="fa-solid fa-pen-to-square"></i> Tracker Nilai</h2>
+        <select id="tracker-subject-select" class="select-input"></select>
+      </div>
+      <div class="panel">
+        <div class="tracker-add-row">
+          <input type="text" id="tracker-label-input" class="text-input" placeholder="Nama ulangan (mis. UH1, UH2, PAS)" />
+          <input type="number" id="tracker-score-input" class="text-input small" placeholder="Nilai" min="0" max="100" />
+          <button class="btn-primary ripple" id="btn-add-score"><i class="fa-solid fa-plus"></i></button>
+        </div>
+        <div class="score-list" id="score-list"></div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION: GRAFIK ============ -->
+    <section class="view" id="view-grafik">
+      <div class="view-head">
+        <h2><i class="fa-solid fa-chart-line"></i> Grafik Perkembangan</h2>
+      </div>
+      <div class="panel">
+        <h3 class="chart-title">Perkembangan Nilai</h3>
+        <div class="chart-wrap"><canvas id="chart-line"></canvas></div>
+      </div>
+      <div class="panel">
+        <h3 class="chart-title">Rata-rata Nilai per Mapel</h3>
+        <div class="chart-wrap"><canvas id="chart-bar"></canvas></div>
+      </div>
+      <div class="panel">
+        <h3 class="chart-title">Persentase Target Tercapai</h3>
+        <div class="chart-wrap small"><canvas id="chart-pie"></canvas></div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION: PROGRESS JUARA 1 ============ -->
+    <section class="view" id="view-progress">
+      <div class="view-head">
+        <h2><i class="fa-solid fa-crown"></i> Progress Juara 1</h2>
+      </div>
+      <div class="panel level-panel">
+        <div class="level-orb" id="level-orb"><i class="fa-solid fa-star"></i></div>
+        <p class="level-name" id="level-name">Pemula</p>
+        <p class="level-avg" id="level-avg">Rata-rata nilai: 0</p>
+        <div class="progress-track big">
+          <div class="progress-fill" id="level-progress-fill" style="width:0%"></div>
+        </div>
+        <div class="level-steps" id="level-steps"></div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION: STATISTIK ============ -->
+    <section class="view" id="view-statistik">
+      <div class="view-head">
+        <h2><i class="fa-solid fa-chart-pie"></i> Statistik</h2>
+      </div>
+      <div class="stat-grid" id="statistik-grid"></div>
+    </section>
+
+    <!-- ============ SECTION: POMODORO ============ -->
+    <section class="view" id="view-pomodoro">
+      <div class="view-head">
+        <h2><i class="fa-solid fa-stopwatch"></i> Pomodoro Timer</h2>
+      </div>
+      <div class="panel pomodoro-panel">
+        <p class="pomodoro-mode" id="pomodoro-mode">Fokus Belajar</p>
+        <div class="pomodoro-ring">
+          <svg viewBox="0 0 200 200">
+            <circle class="ring-bg" cx="100" cy="100" r="90"></circle>
+            <circle class="ring-fill" id="pomodoro-ring-fill" cx="100" cy="100" r="90"></circle>
+          </svg>
+          <p class="pomodoro-time" id="pomodoro-time">25:00</p>
+        </div>
+        <div class="pomodoro-controls">
+          <button class="btn-outline ripple" id="btn-pomo-reset"><i class="fa-solid fa-rotate-left"></i></button>
+          <button class="btn-primary ripple lg" id="btn-pomo-start"><i class="fa-solid fa-play"></i> Mulai</button>
+          <button class="btn-outline ripple" id="btn-pomo-skip"><i class="fa-solid fa-forward"></i></button>
+        </div>
+        <p class="pomodoro-count" id="pomodoro-count">Sesi selesai hari ini: 0</p>
+      </div>
+    </section>
+
+    <!-- ============ SECTION: KALENDER ============ -->
+    <section class="view" id="view-kalender">
+      <div class="view-head">
+        <h2><i class="fa-regular fa-calendar"></i> Kalender Belajar</h2>
+        <div class="calendar-nav">
+          <button class="icon-btn" id="cal-prev"><i class="fa-solid fa-chevron-left"></i></button>
+          <span id="cal-month-label" class="pill"></span>
+          <button class="icon-btn" id="cal-next"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="calendar-grid-head">
+          <span>M</span><span>S</span><span>S</span><span>R</span><span>K</span><span>J</span><span>S</span>
+        </div>
+        <div class="calendar-grid" id="calendar-grid"></div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION: ACHIEVEMENT ============ -->
+    <section class="view" id="view-achievement">
+      <div class="view-head">
+        <h2><i class="fa-solid fa-award"></i> Achievement</h2>
+      </div>
+      <div class="badge-grid" id="badge-grid"></div>
+    </section>
+
+    <!-- ============ SECTION: EXPORT & BACKUP ============ -->
+    <section class="view" id="view-export">
+      <div class="view-head">
+        <h2><i class="fa-solid fa-file-export"></i> Export &amp; Backup</h2>
+      </div>
+      <div class="export-grid">
+        <button class="export-card ripple" id="btn-export-pdf">
+          <i class="fa-solid fa-file-pdf"></i>
+          <p>Export PDF</p>
+          <span>Ringkasan progres &amp; nilai</span>
+        </button>
+        <button class="export-card ripple" id="btn-export-excel">
+          <i class="fa-solid fa-file-excel"></i>
+          <p>Export Excel</p>
+          <span>Data nilai &amp; jadwal</span>
+        </button>
+        <button class="export-card ripple" id="btn-backup-json">
+          <i class="fa-solid fa-download"></i>
+          <p>Backup JSON</p>
+          <span>Simpan seluruh data</span>
+        </button>
+        <button class="export-card ripple" id="btn-import-json">
+          <i class="fa-solid fa-upload"></i>
+          <p>Import JSON</p>
+          <span>Pulihkan data</span>
+        </button>
+        <input type="file" id="import-file-input" accept="application/json" hidden />
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<button class="fab ripple" id="fab-checklist" title="Checklist Cepat">
+  <i class="fa-solid fa-check"></i>
+</button>
+
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="active" data-target="dashboard"><i class="fa-solid fa-house"></i><span>Home</span></button>
+  <button data-target="jadwal"><i class="fa-solid fa-table-list"></i><span>Jadwal</span></button>
+  <button data-target="checklist"><i class="fa-solid fa-list-check"></i><span>Checklist</span></button>
+  <button data-target="grafik"><i class="fa-solid fa-chart-line"></i><span>Grafik</span></button>
+  <button id="bottom-nav-more"><i class="fa-solid fa-bars"></i><span>Menu</span></button>
+</nav>
+
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
